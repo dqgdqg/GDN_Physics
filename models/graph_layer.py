@@ -8,11 +8,13 @@ from torch_geometric.nn.inits import glorot, zeros
 import time
 import math
 
+from IPython import embed
+
 class GraphLayer(MessagePassing):
     def __init__(self, in_channels, out_channels, heads=1, concat=True,
                  negative_slope=0.2, dropout=0, bias=True, inter_dim=-1,**kwargs):
         super(GraphLayer, self).__init__(aggr='add', **kwargs)
-
+        self.node_dim=0
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.heads = heads
@@ -61,9 +63,7 @@ class GraphLayer(MessagePassing):
         edge_index, _ = remove_self_loops(edge_index)
         edge_index, _ = add_self_loops(edge_index,
                                        num_nodes=x[1].size(self.node_dim))
-
-        out = self.propagate(edge_index, x=x, embedding=embedding, edges=edge_index,
-                             return_attention_weights=return_attention_weights)
+        out = self.propagate(edge_index, x=x, embedding=embedding, edges=edge_index, return_attention_weights=return_attention_weights)
 
         if self.concat:
             out = out.view(-1, self.heads * self.out_channels)
@@ -107,7 +107,8 @@ class GraphLayer(MessagePassing):
 
 
         alpha = F.leaky_relu(alpha, self.negative_slope)
-        alpha = softmax(alpha, edge_index_i, size_i)
+        # embed()
+        alpha = softmax(alpha, edge_index_i, num_nodes=size_i)
 
         if return_attention_weights:
             self.__alpha__ = alpha
