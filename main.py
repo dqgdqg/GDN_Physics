@@ -33,6 +33,8 @@ import matplotlib.pyplot as plt
 import json
 import random
 
+from IPython import embed
+
 class Main():
     def __init__(self, train_config, env_config, debug=False):
 
@@ -61,7 +63,8 @@ class Main():
         self.feature_map = feature_map
 
         train_dataset_indata = construct_data(train, feature_map, labels=0)
-        test_dataset_indata = construct_data(test, feature_map, labels=test.attack.tolist())
+        test_dataset_indata = construct_data(test, feature_map, labels=0)
+        # test_dataset_indata = construct_data(test, feature_map, labels=test.attack.tolist())
 
 
         cfg = {
@@ -124,6 +127,7 @@ class Main():
         _, self.val_result = test(best_model, self.val_dataloader)
 
         self.get_score(self.test_result, self.val_result)
+        # embed() # feature, 
 
     def get_loaders(self, train_dataset, seed, batch, val_ratio=0.1):
         dataset_len = int(len(train_dataset))
@@ -154,7 +158,7 @@ class Main():
         np_val_result = np.array(val_result)
 
         test_labels = np_test_result[2, :, 0].tolist()
-    
+        embed()
         test_scores, normal_scores = get_full_err_scores(test_result, val_result)
 
         top1_best_info = get_best_performance_data(test_scores, test_labels, topk=1) 
@@ -200,7 +204,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-batch', help='batch size', type = int, default=128)
     parser.add_argument('-epoch', help='train epoch', type = int, default=100)
-    parser.add_argument('-slide_win', help='slide_win', type = int, default=15)
+    parser.add_argument('-slide_win', help='slide_win', type = int, default=100)
     parser.add_argument('-dim', help='dimension', type = int, default=64)
     parser.add_argument('-slide_stride', help='slide_stride', type = int, default=5)
     parser.add_argument('-save_path_pattern', help='save path pattern', type = str, default='')
@@ -214,7 +218,7 @@ if __name__ == "__main__":
     parser.add_argument('-val_ratio', help='val ratio', type = float, default=0.1)
     parser.add_argument('-topk', help='topk num', type = int, default=20)
     parser.add_argument('-report', help='best / val', type = str, default='best')
-    parser.add_argument('-load_model_path', help='trained model path', type = str, default='')
+    parser.add_argument('-load_model_path', help='trained model path', type = str, default='/home/qgding/physics/GDN_Physics/pretrained/physics_clip/best_02|24-07:36:13.pt')
 
     args = parser.parse_args()
 

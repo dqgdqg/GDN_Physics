@@ -14,7 +14,7 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score, f1_sco
 from torch.utils.data import DataLoader, random_split, Subset
 from scipy.stats import iqr
 
-
+from tqdm import tqdm
 
 
 def loss_func(y_pred, y_true):
@@ -54,13 +54,18 @@ def train(model = None, save_path = '', config={},  train_dataloader=None, val_d
     stop_improve_count = 0
 
     dataloader = train_dataloader
-
+    
+    
     for i_epoch in range(epoch):
 
         acu_loss = 0
+        acu_cnt = 0
         model.train()
-
-        for x, labels, attack_labels, edge_index in dataloader:
+        
+        pbar = tqdm(dataloader)
+        for x, labels, attack_labels, edge_index in pbar:
+            pbar.set_description('Epoch ' + str(i_epoch))
+            
             _start = time.time()
 
             x, labels, edge_index = [item.float().to(device) for item in [x, labels, edge_index]]
@@ -75,6 +80,11 @@ def train(model = None, save_path = '', config={},  train_dataloader=None, val_d
             
             train_loss_list.append(loss.item())
             acu_loss += loss.item()
+            acu_cnt += 1
+            
+            pbar.set_postfix(
+                loss='%.3f' % (acu_loss/acu_cnt)
+            )
                 
             i += 1
 
