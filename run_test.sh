@@ -3,6 +3,7 @@ DATASET=$2
 
 seed=5
 BATCH_SIZE=32
+# SLIDE_WIN=5
 SLIDE_WIN=20
 dim=64
 out_layer_num=1
@@ -12,6 +13,7 @@ out_layer_inter_dim=128
 val_ratio=0.2
 decay=0
 
+load_model_path="/home/qgding/physics/GDN_Physics/pretrained/physics_clip/best_03|10-14:29:36.pt"
 
 path_pattern="${DATASET}"
 COMMENT="${DATASET}"
@@ -37,6 +39,7 @@ if [[ "$gpu_n" == "cpu" ]]; then
         -val_ratio $val_ratio \
         -report $report \
         -topk $topk \
+        -load_model_path $load_model_path \
         -device 'cpu'
 else
     CUDA_VISIBLE_DEVICES=$gpu_n  python main.py \
@@ -55,5 +58,6 @@ else
         -decay $decay \
         -val_ratio $val_ratio \
         -report $report \
-        -topk $topk
+        -topk $topk \
+        -load_model_path $load_model_path
 fi

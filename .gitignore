@@ -7,3 +7,4 @@ run_copy.sh
 __pycache__
 *.npy
 data/
+images/
